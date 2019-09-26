@@ -1,0 +1,402 @@
+------------- pgadmin4 --------------------
+
+set search_path to live4839dev1;
+do
+$$
+declare 
+	dataValueCode record;
+begin
+    FOR dataValueCode IN select * from data_value_code where question_id in (select distinct question_id from data_value_code) loop
+        raise notice '%', dataValueCode.code;
+    end loop;
+end
+$$
+-----------------------------------------
+PSQL set statement_timeout
+
+set statement_timeout to 0; // off
+-----------------------------------------
+FIND KILL PROCESS ON WINDOWS
+Windows:
+netstat -a -o | find "8080"
+TaskKill /PID 13724 /f
+Linux: kill -s 9 pid
+-----------------------------------------
+Linux find file 
+sudo grep -r "text"  /path
+-----------------------------------------
+sudo svc -d 
+
+See folder size
+du -h dod/creams/1447109271/Bendamustine_DEV_2015-11-09_16_47_51
+du -sbh dod/creams/1447109271/Bendamustine_DEV_2015-11-09_16_47_51
+---------------------------------
+create database f2blinding_develop with template creams_template;
+
+uname: enterprisedb
+pass: clivefrog12
+---------------------------------
+migrate -synchronous -test (ROLLBACK)
+./script/migrate -s -t
+---------------------------------
+Time Entry
+ - You must submit known PTO ahead of time
+---------------------------------
+---------------------------------
+Get the chmod numerical value for a file	stat --format '%a' <file>
+Change the sudo timeout: sudo visudo
+#Set the timeout required to re-enter the sudo password in minutes
+Defaults    timestamp_timeout=60
+
+GIT Notes
+Change commit date to now: git commit --amend --date=now
+rebase local topic branch onto local develop branch: git rebase -i develop
+run script/test with verbose for risky commits: 	./script/test -v -r -f CTemplateTest
+Run script/test with filters: 						./script/test -f "(UserControllerTest|AuthServiceTest|CSessionTest|AnnotationApplicationControllerTest|ApprovalApplicationControllerTest|CEmonTest|WebhookControllerTest|Job*Test|PublishTest_devToUAT_AuditModel|EmonHelperTest)"
+squash commits: git rebase -i HEAD~2
+change commit message many commits
+			- 22c0c5accaa6a64d51be2e1c48383e7b54e13df6 is the 1st commit before the commit where you need to start the changes.
+			git filter-branch --msg-filter 'sed -e "s/^IMN-904/IMN-928/"' 22c0c5accaa6a64d51be2e1c48383e7b54e13df6..HEAD
+
+set up new git repo									git clone ssh://git@stash.mednetstudy.com:7999/~creams/2016f1.git .
+													git co XXX
+													gitsub
+													touch webroot/VERSION
+show diff for last commit							git diff HEAD^ HEAD
+search git different			
+Change last commit author date to now				git commit --amend --date=now
+
+Merge conflict with candidate build:
+	git co -b release/workflow-conflict-resolution-2016-10-14 prod/release/build/v1.164.0
+	git pull 2016f3-workflow master
+	Resolve merge conflicts
+	Push to place causing conflict, here Workflow repo
+	git push 2016f3-workflow
+	create pull request into 'imednet production origin' 'prod/release/build/v1.164.0'
+	
+git log --graph --decorate
+ - rename a branch
+	git branch -m <old> <new>
+	git branch -m feature/30944-workflow-manager-ui-no-bl feature/30944-workflow-manager
+	git push 2015F2
+	git b --set-upstream-to agile4-master/techdebt/IMN-6122-delete-user-end-point-2
+ - PUll another branch from someone else			
+	show which repos you have now					git remote show
+													git remote add 2016F1 ssh://git@stash.mednetstudy.com:7999/~creams/2016f1.git
+	add the 2015F2									git remote add 2015F2 ssh://git@stash.mednetstudy.com:7999/~creams/2015f2.git
+	make one for someone else						git remote add walker ssh://git@stash.mednetstudy.com:7999/~wcanarsky/2015f1.git
+													git remote add hughes ssh://git@stash.mednetstudy.com:7999/~ehughes/2015f1.git
+													git remote add greulingf2 ssh://git@stash.mednetstudy.com:7999/~cgreuling/2015f2.git
+													git remote add mskree ssh://git@stash.mednetstudy.com:7999/~mskree/2015f2.git
+													git remote add master ssh://git@stash.mednetstudy.com:7999/im-2016f1/develop.git
+													git remote add richard ssh://git@stash.mednetstudy.com:7999/~rwilliamson/2016f1.git
+													git co -b emon-changes richard/feature/30803_emon_to_mvc
+													feature/29715-inventory-auto-resupply
+	get the SSH get from his repo -> clone
+	to show some else branch						git b -vv							
+													git co buermann/bugfix/22212-BL-Errors-on-hidden-tab-prevent-save
+													git co hughes/feature/26416-rbmFixes
+ - See what changed on a commit hash				git whatchanged -m -n 1 -p a057ef3b967628789098a858163cf249b331ec0f
+ - Update a commit message:							
+	- Find the commit hash that is right before the one you want to change
+	- rebase										git rebase -i 71bff8f8f4ef1a8ec43458548841e4736b2b9284
+													git push 2015F2 -f
+	OR 												git rebase -i HEAD~n, display a list of the last n commits in your default text editor.
+
+ - Rebase your branch onto its own master
+	feature/IMN-3788-coding-audit-system_view             21ab91e [2017f1-master/feature/IMN-3788-coding-audit-system_view]
+	git rebase -i 2017f1-master/master
+ - Rebase from devel/master to another/master
+   1) git co yourbranch
+   2) git rebase -i 2017-01-Maint/master
+   3) pick b2e3502 IMN-3401 - Allow manual assignment of inventory items to 2nd inventory catalog that is not mapped to randomization arm.
+   4) git push 2017-01-Maint bugfix/IMN-3401-non-randomized-inventory-assignment
+   5) Set upstream branch from 2015F2 to 2016F1		git b --set-upstream-to 2017-01-Maint/bugfix/IMN-3826-workflow-sdv-ignores-rbs
+													
+													
+	pick c28e31c refs #9104 - Modified code to show an error and stop the save
+	# Rebase 4a8b062..c28e31c onto 4a8b062
+	#
+	# Commands:
+	#  p, pick = use commit
+	#  r, reword = use commit, but edit the commit message
+	#  e, edit = use commit, but stop for amending
+	#  s, squash = use commit, but meld into previous commit
+	#  f, fixup = like "squash", but discard this commit's log message
+	#  x <cmd>, exec <cmd> = Run a shell command <cmd>, and stop if it fails
+	#
+	# If you remove a line here THAT COMMIT WILL BE LOST.
+	# However, if you remove everything, the rebase will be aborted.
+ - Stash and later pop changes						git stash save (s s d) / pop (no arguments)
+ - See your commits									git log --committer creams
+													commit 189490352f911517c781788fc77e6e6fd60cd77f
+													git show 189490352f911517c781788fc77e6e6fd60cd77f
+ - Username:										git config --global user.name creams
+ - Email:											git config --global user.email creams@mednetstudy.com
+ - revert: remove a "merge" from master 			Update git: git remote update
+													pull changes into master and then the local branch: git co f2master; git pull 2015F2 master; Do same on local branch
+													git co bugfix/30358-autoquery-fails-during-record-save
+													-m1: m is for "merge"
+													The commit hash is the commit hash of the merge
+													git revert -m1 3f94f0b5f116c88c59e4dd0a00e4ac857cbc589c
+ - revert: remove the last commit					git reset --hard HEAD^
+													git reset --hard HEAD~1
+ - reset to a certain commit						git reset --hard 2a63902d838b9313295dab3686474a41b5f972f1
+ - reset hard at any point before a "push" 			git reset --hard 2016F1/master
+	- NOTE: this is done quite often during "rebase"
+	- NOTE: this is done quite often during "revert"
+													
+ - We will typically work from the verified-next branch.
+ - Check out a remote branch:						git co verified-next
+ - Chech out existing branch:						git checkout <RedminTicket#>-<40-char description of ticket/branch> 
+ - Branch for my changes: 							git co -b 24633-short-title production/verified-next
+													
+	Where 24633 is the ticket #
+	And you provide a short description of what 
+	you're working on
+	A branch is not available to others unless you 
+	push the branch to your remote repository
+ - Rebase and remove a commit						git rebase -i HEAD~3
+   The ~3 means look back at the last 3 commits.
+ - Delete the branch: 								git branch -D 24633-short-title
+ - Log info											git log --author=bob
+	compressed log where each commit is one line:	git log --pretty=oneline
+	see only files that have changed				git log --name-status
+ - Continue Work/Check Out Another Branch			git remote add <user repository to track> git@git.imednet.com:<user repository to track>
+													git checkout -b <new branch name> production/verified-next (Creates a branch based on the production/verified-next branch and switches to that branch)	
+ - Unstage											git reset .
+ - Stashing											git stash save
+													gut stash pop
+ - Merge / pull 1 commit hash:						git merge 888043beed1664ddf924e7b37c4d0b4bc5ef1f00
+_____________________________________________________________________________
+GEARMAN
+sudo service gearmand status
+sudo svc -u /service/*gearman
+
+---------------------------------------
+casebook service
+sudo pm2 logs
+sudo pm2 stop casebook-service
+sudo pm2 start casebook-service
+---------------------------------------
+pdf service 
+sudo pm2 logs
+sudo pm2 stop pdf-service
+sudo pm2 start pdf-service
+----------------------------------------
+Web Services
+cd /opt/java/
+Services defined at:  ls /etc/init.d/poc-patient (this is where -D is set up for nopool)
+sudo service poc-auth status
+----------------------------------------
+Additional email addresses
+anything@creams.imednet.com
+----------------------------------------
+feature-accepted: icdv-prd-web138.cd.imednet.com
+workers on sumo logic: https://service.us2.sumologic.com/ui/#section/search/Q81rvgQ6HbZ46YofHKUA3szoBRrtrXhP0ZfsBjAT
+php error: https://service.us2.sumologic.com/ui/#section/search/1eCdATfP1F4x4tMFr2NoWoYMWb6DKLVNqkfJpsVb
+----------------------------------------
+gradle:
+gradlew flywayClean -Dflyway.url=jdbc:postgresql://localhost:5444/auth_service -Dflyway.user=postgres -Dflyway.password=BlueWasp0852
+
+----------------------------------------
+Windows
+	kill task: Taskkill /PID 11356 /F
+
+----------------------------------------
+http://docs.aws.amazon.com/cli/latest/userguide/awscli-install-windows.html#install-msi-on-windows
+
+aws_access_key_id = AKIAJYYZFCMKR3OWRZGA
+aws_secret_access_key = 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
+
+aws configure
+
+ aws iam get-user
+{
+    "User": {
+        "UserName": "imn_api",
+        "Path": "/",
+        "CreateDate": "2016-12-14T18:11:27Z",
+        "UserId": "AIDAIS5NFQ7UDKXLJACZG",
+        "Arn": "arn:aws:iam::235846210842:user/imn_api"
+    }
+}
+----------------------------------------
+switch user
+sudo su capdeploy
+--------------------------------------------
+psql output to file
+\o foo.txt
+\o to turn it back off
+-------------------------------------------------
+sudo chown jroman webroot/classes/models/Record.php
+sudo chgrp imednet_devs webroot/classes/models/Record.php
+sudo chmod 0644 webroot/classes/models/Record.php
+
+-rw-r--r-- 1 jroman imednet_devs 12413 Aug 16 16:35 app/controllers/epro_controller.php
+-rw-r--r-- 1 jroman imednet_devs 16478 Aug 16 15:38 app/services/AuthService.php
+-------------------------------------------------
+
+Connection through bastion:
+
+Perf Test Environment
+http://confluence.mednetstudy.com/display/PER/PerfTest+AWS+Environment
+
+On VM
+	- vi ~/.ssh/config
+		- Place this into it:
+Host bastion
+	HostName 10.224.0.9
+	User centos
+	IdentityFile ~/.ssh/bastion_id_rsa
+		- Create file: vi ~/.ssh/bastion_id_rsa
+		- Place this into it:
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpQIBAAKCAQEAw/+VEZgS11vyShgAsoCiVeUZ/SR72lZAPyet5raiOGXhnPTC
+7xLr2EI2QarKua5CN7rIastWZf70U3Vz89/mQFVPzXhiMtBA4CrQIG6B8PUE4ts0
+roH9gQj9td2hr5/I/vjawMUw52yEb1u+ZTDM4EwnPazV57tZeZuS6Ie+DgEXbKY3
+G25pe4HJsmPlEs5mdQSogHSnBpKdgKnKipKSccfHikyeh6K3TfRvUZyTMs8MjJJA
+NgAK0pRPCNZ8qBLyPkHnU8xI0SPoJNmYxoQtHi96ENI4go0kZ+oZx0e5+4JZDfYU
+HGcYK8NGc3OdqFJggWeX4gxq9t7LBXp8UadLnQIDAQABAoIBADUzYcYlzi9wwMKF
+42KQcf/4sOY6iffI46WA4r42IrBGT0goU+VK8IOB7XJDpsVh3I1+ALqkOO50luM0
+hWXUB4682W1/WMBMMN/oHxg+hrzd9RaSw6j+lc35n8xGvYWLTKaQ6+fZXp3iocwM
+ThDvfxz+7sPZ7zH4c6ADr4u4lMj93kJNUnppkkx8h6X6LftMyjiHFtSLlvycQSvC
+xZcSVY3vpTFdis5CQ9CPn5Z3XOEqax61XXDx8MAhY2r+sVdsKeK0BmcXegLsAwNL
+ipBW9OHVo+Rm8yIa/dNMCbSkZCpKOQK2vZEc1rghISS/PuMw9BaD4khFZ9BbGybP
+RRUhsc0CgYEA/n65BOcgaJZrh9e5yibkjOB5JVAKhThRqn9ANVBHPFuomOeTu6Jd
+TaTP1GIHnoM/zy/+t5dgPM++fhXQIb0vhEoh4+2b0rlctzbfmAwm/jTuKkcj4WSe
+P5ni7XxgxWigsxFCDbthOx4vGtGqlNdpF6Kx3y/9Upf8hOIKmF2ADcMCgYEAxShN
+WFC2LvlHpRnbgoAdSjpPOUha4mkrHxH92PQgEXPGZxr9rCQZ0lQOvkdWn694CZTP
+HCLtx3Ki4P1bHOBrPxz0D9h70zX0nBvVG0frgZcIRR+gNxFL0SDV10aRsSR7rzZt
+w7GQIkJo9wjyuu0XSdPQ+xQfh0U9jFpYxAsUyx8CgYEAjE4K7PQLfv2mzN6W9Ccb
+C7vZrkOBeU7CX1AGcx4OF+2kdp/9Z42tCNhbKAjfkHllnXElacwP55bUu6iE9YTa
+hIFmS8W8iaFdxzh+btIMUUuXHkHYOzQAtqm9XRacN1lmdzKFixKKGVCbwZpkA+j6
+bGhqzdQkQfu+4PfJxZSOu4cCgYEAkakj86K15uCPGSCQd8r1WNjZnUWit/HhRPRC
+6p36b0ptA9ICJsMJPMaTmesUyaeW9OU3Wt9Hc3pzcexc+2mmcpuOiYJ0gWg0j31U
+pfItwbF3D7K86NJjhF9Q/dqKWyjMJHf/AnzWMymDaTf4NThjY00V8do9LPBv95js
+SfKx6xsCgYEAnlYJQS9PXebshT/Y553VJtauPs9aktF+SIq58HsQBa82LvhRUryQ
+3jAP3lGVAvyMWvJztVSGZ6REtG4ZcGxOKCSHUTw+2SCpvAc+8AE3aC0lkZtWTlbY
+fyuSTo9tYR6HCkLbbzppNgYWgDmQVD0vC8fwpwGy6RGTIR3RpCvNTlo=
+-----END RSA PRIVATE KEY-----
+		- Change permissions: chmod 0600 ~/.ssh/bastion_id_rsa
+		- ssh bastion
+	- Once into bastion
+		- Swarm Manager	10.12.14.147 (for Perf Test)
+		- ssh 172.33.10.204 -i ~/bamboo_rsa
+	- Once into swarm connect to RDS Perf Test database
+		- psqlperf (in .bashrc)
+
+-------------------------------------------------
+----------------------
+Trouble shooting unable to publish - database issue
+rm config/shards.creams_a5_develop.xml
+./script/generate_shard_xml -f config/shards.creams_a5_develop.xml
+delete schema def files: 
+rm temp/*.php
+insert into imednet.user_role_relationship (user_id, role_id, date_added) values(27018, 5, now())
+
+-------------------------------------------------
+CYGWIN and GIT
+
+https://stackoverflow.com/questions/11443687/the-authenticity-of-host-cant-be-established
+ssh -vt stash.mednetstudy.com
+
+One time: ssh-keygen
+https://www.ssh.com/ssh/keygen/
+-------------------------------------------------
+Tar exclude hidden files
+sudo tar cfvz creams.tar.gz creams --exclude=".*"
+-------------------------------------------------
+
+ng serve --configuration=local
+
+
+--------------------------------------------------------
+timeentryapi
+
+To Build and Publish
+    - Install the Azure CLI: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?view=azure-cli-latest11
+    - Install yarn
+    - Open Windows power shell - Run as Administrator
+    - Connect-MsolService
+    - Using Windows Power Shell: 
+        az acr login --name intertech
+    - yarn build (while in the same power shell)
+    - yarn push (while in the same power shell)
+    - http://localhost:3000/
+        Accept: vnd.intertech.v1+json
+    - See: README.md and DEVELOPER.md
+    
+
+To Run
+    - yarn docker-stop
+    - yarn docker-start
+
+--------------------------------------------------------
+
+TimeEntryPwa
+
+npm run start
+
+--------------------------------------------------------
+
+## List Docker CLI commands
+docker
+docker container --help
+
+## Display Docker version and info
+docker --version
+docker version
+docker info
+
+## Execute Docker image
+docker run hello-world
+
+## List Docker images
+docker image ls
+
+## List Docker containers (running, all, all in quiet mode)
+docker container ls
+docker container ls --all
+docker container ls -aq
+
+--------------------------------------------------------
+
+docker run intertech.azurecr.io/
+
+netstat -a -n
+Run resmon.exe, or from TaskManager performance tab
+
+--------------------------------------------------------
+
+- A container is launched by running an image. An image is an executable package that includes everything needed to run an application–the code, a runtime, libraries, environment variables, and configuration files.
+- A container is a runtime instance of an image–what the image becomes in memory when executed (that is, an image with state, or a user process). You can see a list of your running containers with the command, docker ps, just as you would in Linux. — from Docker Concepts
+- docker ps — Lists running containers. Some useful flags include: 
+    -a / -all for all containers (default shows just running) and 
+    —-quiet /-q to list just their ids (useful for when you want to get all the containers).
+- docker pull — Most of your images will be created on top of a base image from the Docker Hub registry. Docker Hub contains many pre-built images that you can pull and try without needing to define and configure your own. To download a particular image, or set of images (i.e., a repository), use docker pull.
+- docker build — The docker build command builds Docker images from a Dockerfile and a “context”. A build’s context is the set of files located in the specified PATH or URL. Use the -t flag to label the image, for example docker build -t my_container . with the . at the end signalling to build using the currently directory.
+- docker run — Run a docker container based on an image, you can follow this on with other commands, such as -it bash to then run bash from within the container. Also see Top 10 options for docker run — a quick reference guide for the CLI command. docker run my_image -it bash
+- docker logs — Use this command to display the logs of a container, you must specify a container and can use flags, such as --follow to follow the output in the logs of using the program. docker logs --follow my_container
+- docker volume ls — This lists the volumes, which are the preferred mechanism for persisting data generated by and used by Docker containers.
+- docker rm — Removes one or more containers. docker rm my_container
+- docker rmi — Removes one or more images. docker rmi my_image
+- docker stop — Stops one or more containers. docker stop my_container stops one container
+  docker stop $(docker ps -a -q) stops all running containers. 
+    A more direct way is to use docker kill my_container, which does not attempt to shut down the process gracefully first.
+- kill all running containers with docker kill $(docker ps -q)
+- delete all stopped containers with docker rm $(docker ps -a -q)
+- delete all images with docker rmi $(docker images -q)
+
+--------------------------------------------------------
+
+tagging 
+
+git show v1.0.1
+git tag -a v1.0.1 -m "v1.0.1 Jenkins Build #33 2019-09-23"
+git push --delete origin v1.0.1
+git push origin v1.0.1
+
+--------------------------------------------------------
+
+git push -u origin master
